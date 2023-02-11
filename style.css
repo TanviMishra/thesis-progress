@@ -1,0 +1,36 @@
+*{
+    box-sizing: border-box;
+}
+#grid{
+    width: 70vw;
+    background-color: green;
+    display: flex;
+    flex-wrap: wrap;
+}
+.gridUnit{
+    border: 1px solid black;
+}
+.ocean{
+    background-color: aqua;
+}
+.Asia{
+    background-color: green;
+}
+.Europe{
+    background-color: greenyellow;
+}
+.SouthAmerica{
+    background-color: yellow;
+}
+.Africa{
+    background-color: orange;
+}
+.NorthAmerica{
+    background-color: olive;
+}
+.Oceania{
+    background-color: wheat;
+}
+.Antarctica{
+    background-color: whitesmoke;
+}
