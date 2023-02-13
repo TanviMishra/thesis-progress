@@ -1,36 +1,49 @@
 *{
     box-sizing: border-box;
+    margin:0;
 }
 #grid{
-    width: 70vw;
+    width: 90vw;
     background-color: green;
     display: flex;
     flex-wrap: wrap;
 }
 .gridUnit{
-    border: 1px solid black;
+    border: 0.1px solid blue;
 }
 .ocean{
-    background-color: aqua;
+    background-color: blue;
+}
+/* .Europe{
+    background-color: rgb(37, 53, 37);
 }
 .Asia{
-    background-color: green;
-}
-.Europe{
     background-color: greenyellow;
 }
-.SouthAmerica{
+.Americas{
     background-color: yellow;
 }
 .Africa{
     background-color: orange;
 }
-.NorthAmerica{
-    background-color: olive;
-}
 .Oceania{
     background-color: wheat;
+} */
+.Meadows{
+    background-color: orange;
 }
-.Antarctica{
-    background-color: whitesmoke;
+.Cropland{
+    background-color: yellow;
+}
+.Planted_Forest{
+    background-color: lightgreen;
+}
+.Naturally_regenerating_forest{
+    background-color: green;
+}
+.Other_land{
+    background-color: grey;
+}
+.ground{
+    background-color: black;
 }

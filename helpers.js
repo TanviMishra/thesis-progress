@@ -4,7 +4,6 @@ export function createAndFillTwoDArray({ rows, columns, defaultValue }) {
     Array.from({ length: columns }, () => defaultValue)
   );
 }
-
 //fn call: helpers.valueDependentMovementTwoDArray({array: arr1, xpos: int, ypos: int, direction: top/right/left/bottom, values: [int1, int2]})
 export function valueDependentMovementTwoDArray({
   array,
@@ -58,7 +57,7 @@ export function valueDependentMovementTwoDArray({
       break;
   }
 }
-
+//chooses a random index from arr of specified value
 export function randomIndexForValue(arr, value) {
   let indices = [];
   for (let i = 0; i < arr.length; i++) {
@@ -68,8 +67,11 @@ export function randomIndexForValue(arr, value) {
       }
     }
   }
-  return indices[Math.floor(Math.random() * indices.length)];
+  if (indices.length > 0)
+    return indices[Math.floor(Math.random() * indices.length)];
+  else return false;
 }
+//returns true is all 8 positions around a specific position [x][y] in the array (arr) have values that are included in valueArr
 export function checkAll8Adjacent(arr, x, y, valueArr) {
   let rows = arr.length;
   let cols = arr[0].length;
