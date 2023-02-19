@@ -7,7 +7,7 @@ let rawLandUseData = [
     "Element Code": 5110,
     Element: "Area",
     "Item Code": 6600,
-    Item: "Country area",
+    Item: "continent area",
     "Year Code": 2020,
     Year: 2020,
     Unit: "1000 ha",
@@ -183,7 +183,7 @@ let rawLandUseData = [
     "Element Code": 5110,
     Element: "Area",
     "Item Code": 6600,
-    Item: "Country area",
+    Item: "continent area",
     "Year Code": 2020,
     Year: 2020,
     Unit: "1000 ha",
@@ -359,7 +359,7 @@ let rawLandUseData = [
     "Element Code": 5110,
     Element: "Area",
     "Item Code": 6600,
-    Item: "Country area",
+    Item: "continent area",
     "Year Code": 2020,
     Year: 2020,
     Unit: "1000 ha",
@@ -535,7 +535,7 @@ let rawLandUseData = [
     "Element Code": 5110,
     Element: "Area",
     "Item Code": 6600,
-    Item: "Country area",
+    Item: "continent area",
     "Year Code": 2020,
     Year: 2020,
     Unit: "1000 ha",
@@ -711,7 +711,7 @@ let rawLandUseData = [
     "Element Code": 5110,
     Element: "Area",
     "Item Code": 6600,
-    Item: "Country area",
+    Item: "continent area",
     "Year Code": 2020,
     Year: 2020,
     Unit: "1000 ha",
@@ -887,7 +887,7 @@ let rawLandUseData = [
     "Element Code": 5110,
     Element: "Area",
     "Item Code": 6600,
-    Item: "Country area",
+    Item: "continent area",
     "Year Code": 2020,
     Year: 2020,
     Unit: "1000 ha",
@@ -1056,57 +1056,38 @@ let rawLandUseData = [
     "Flag Description": "Estimated value",
   },
 ];
-// let countryFormat = [
-//   {
-//     country: "", //row.Area
-//     countryArea: "", //row.Item=="Country area"
-//     subplots: {
-//       landArea: "", //row.Item=="Land area"
-//       agriculture: "", //row.Item=="Agriculture"
-//       meadows: "", //row.Item=="Meadows"
-//       cropland: "", //row.Item=="Cropland"
-//       cover: "", //agriculture- (meadows+cropland)
-//       forest: "", //row.Item=="Forest land"
-//       natural: "", //row.Item=="Naturally regenerating forest" FLOOR
-//       planted: "", //row.Item=="Planted Forest" CIEL
-//       other: "", //row.Item=="Other land"
-//       water: "", //countryArea-landArea
-//       inland: "", //row.Item=="Inland waters"
-//       coastal: "", //water-inland
-//     },
-//   },
-// ];
-export let COLUMN_TOTAL = 150; //x value
-export let ROW_TOTAL = 100; //y value
+
+export let COLUMN_TOTAL = 160; //x value
+export let ROW_TOTAL = 80; //y value
 export let countriesSizeArr = [
   //   {
-  //     country: "World", //row.Area
-  //     countryArea: 0, //row.Item=="Country area"
+  //     continent: "World", //row.Area
+  //     continentArea: 0, //row.Item=="continent area"
   //     subplots: {},
   //   },
   {
-    country: "Asia", //row.Area
-    countryArea: 0, //row.Item=="Country area"
+    continent: "Asia", //row.Area
+    continentArea: 0, //row.Item=="continent area"
     subplots: {},
   },
   {
-    country: "Europe",
-    countryArea: 0,
+    continent: "Europe",
+    continentArea: 0,
     subplots: {},
   },
   {
-    country: "Americas",
-    countryArea: 0,
+    continent: "Americas",
+    continentArea: 0,
     subplots: {},
   },
   {
-    country: "Africa",
-    countryArea: 0,
+    continent: "Africa",
+    continentArea: 0,
     subplots: {},
   },
   {
-    country: "Oceania",
-    countryArea: 0,
+    continent: "Oceania",
+    continentArea: 0,
     subplots: {},
   },
 ];
@@ -1116,55 +1097,28 @@ let map = COLUMN_TOTAL * ROW_TOTAL; //dimensions.ROW_TOTAL * dimensions.COLUMN_T
 //REFORMATING CURRENT CATEGORIES
 rawLandUseData.forEach((row) => {
   if (row.Element == "Area") {
-    let countryIndex = countriesSizeArr.map((e) => e.country).indexOf(row.Area);
-    // console.log(countryIndex);
-    if (countryIndex != -1) {
-      if (row.Item == "Country area") {
-        let percentageOfWorldArea = doMath(row.Value);
-        countriesSizeArr[countryIndex].countryArea = percentageOfWorldArea;
+    let continentIndex = countriesSizeArr
+      .map((e) => e.continent)
+      .indexOf(row.Area);
+    if (continentIndex != -1) {
+      if (row.Item == "continent area") {
+        countriesSizeArr[continentIndex].continentArea = doMath(row.Value);
       } else if (
         row.Item == "Land area" ||
         row.Item == "Agriculture" ||
         row.Item == "Meadows" ||
         row.Item == "Cropland" ||
         row.Item == "Forest land" ||
-        row.Item == "Naturally regenerating forest" //||
+        row.Item == "Naturally regenerating forest" ||
+        row.Item == "Planted Forest" ||
+        row.Item == "Other land"
       ) {
-        let percentageOfWorldArea = doMath(row.Value);
-        countriesSizeArr[countryIndex].subplots[row.Item] =
-          percentageOfWorldArea;
-      } else if (row.Item == "Other land") {
-        //FUCKING PROBLEM CHILD
-        let percentageOfWorldArea = doMath(row.Value);
-        countriesSizeArr[countryIndex].subplots["Other land"] =
-          percentageOfWorldArea;
-      } else if (row.Item == "Planted Forest") {
-        let percentageOfWorldArea = doMath(row.Value);
-        countriesSizeArr[countryIndex].subplots[row.Item] =
-          percentageOfWorldArea;
+        countriesSizeArr[continentIndex].subplots[row.Item] = doMath(row.Value);
       }
     }
   }
 });
 
-//ADDITIONAL BUILT CATEGORIES
-// countriesSizeArr.forEach((country) => {
-//   let countryIndex = countriesSizeArr
-//     .map((e) => e.country)
-//     .indexOf(country.country);
-//   countriesSizeArr[countryIndex].subplots["Surface"] =
-//     countriesSizeArr[countryIndex].subplots["Agriculture"] -
-//     (countriesSizeArr[countryIndex].subplots["Meadows"] +
-//       countriesSizeArr[countryIndex].subplots["Cropland"]);
-//   countriesSizeArr[countryIndex].subplots["Water"] =
-//     countriesSizeArr[countryIndex].countryArea -
-//     countriesSizeArr[countryIndex].subplots["Land area"];
-//   countriesSizeArr[countryIndex].subplots["Coastal waters"] =
-//     countriesSizeArr[countryIndex].subplots["Water"] -
-//     countriesSizeArr[countryIndex].subplots["Inland waters"];
-// });
-
-console.log(countriesSizeArr);
 function doMath(val) {
-  return Math.floor((val / worldArea) * map);
+  return Math.ceil((val / worldArea) * map);
 }

@@ -1,4 +1,5 @@
-import { worldMap, landUnits } from "./main.js";
+import { worldMap } from "./main.js";
+import { landUnits } from "./landUnit.js";
 import * as helpers from "../helpers.js";
 let twoDimArr = worldMap;
 let domGridContainer = document.querySelector("#grid");

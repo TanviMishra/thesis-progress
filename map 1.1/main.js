@@ -1,42 +1,104 @@
-import * as helpers from "../helpers.js";
-import { COLUMN_TOTAL, ROW_TOTAL, countriesSizeArr } from "../landuseCalc.js";
-const DIRECTIONS_ARR = ["top", "right", "bottom", "left"];
-const ISLAND_COUNT = 5;
-const DEFAULT_VALUE = "ocean";
-const SIZE = [
-  { country: "Asia", countryArea: 31 },
-  { country: "Europe", countryArea: 22 },
-  { country: "Americas", countryArea: 39 },
-  { country: "Africa", countryArea: 29 },
-  { country: "Oceania", countryArea: 8 },
-];
-let islandSizeArr = [...Array(ISLAND_COUNT)].map((x, i) => SIZE[i]);
-let testMap = [
-  [0, 0, 0, 0, 0],
-  [0, 0, 1, 0, 0],
-  [0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0],
-];
-let calls = 0;
-class landUnits {
-  constructor(continent, landType, biostock = 0) {
+export class landUnits {
+  constructor(continent, landType, coordinates, biostock = 0) {
     this.continent = continent;
     this.landType = landType;
     this.biostock = biostock;
+    this.coordinates = coordinates;
+    if (this.landType == "Naturally_regenerating_forest") {
+      this.biostock = helpers.randomNumber(1, 12);
+    }
+    if (this.landType == "Planted_Forest") {
+      this.biostock = helpers.randomNumber(1, 6);
+    }
+    if (this.landType == "Other_land") {
+      this.biostock = helpers.randomNumber(1, 6);
+    }
+    this.carbonEmited = this.carbonEmitCalc(this.landType);
   }
-  displayColor(domElement) {
-    domElement.classList.add(this.landType);
+  renameLandTypes(type) {
+    switch (type) {
+      case "Naturally_regenerating_forest":
+        return "Primary forest";
+        break;
+      case "Planted_Forest":
+        return "Baby forest";
+        break;
+      case "Meadows":
+        return "Meadows";
+        break;
+      case "Cropland":
+        return "Farms";
+        break;
+      case "Other_land":
+        return "Barren land";
+        break;
+      case "Urban_land":
+        return "Cities";
+        break;
+      default:
+        break;
+    }
+  }
+  carbonEmitCalc(type) {
+    switch (type) {
+      case "Naturally_regenerating_forest":
+        return this.biostock;
+        break;
+      case "Planted_Forest":
+        return this.biostock;
+        break;
+      case "Meadows":
+        return 20;
+        break;
+      case "Cropland":
+        return 10;
+        break;
+      case "Other_land":
+        return this.biostock;
+        break;
+      case "Urban_land":
+        return 20;
+        break;
+      case "Water":
+        return 0;
+        break;
+      default:
+        break;
+    }
+  }
+  hoverInfo(domElement) {
+    domElement.innerHTML =
+      "Land type: " +
+      this.renameLandTypes(this.landType) +
+      "<br>" +
+      "Carbon emitted: " +
+      this.carbonEmited +
+      "<br>";
+    // if (this.biostock != 0) {
+    //   domElement.innerHTML += "Carbon stock: " + this.biostock;
+    // }
+    domElement.style.top = event.clientY + 10 + "px";
+    domElement.style.left = event.clientX + 10 + "px";
+  }
+  carbonVal() {
+    return this.carbonEmited;
   }
 }
-
+import * as helpers from "../helpers.js";
+import { COLUMN_TOTAL, ROW_TOTAL, countriesSizeArr } from "./landuseCalc.js";
+const DIRECTIONS_ARR = ["top", "right", "bottom", "left"];
+const DEFAULT_VALUE = new landUnits("Ocean", "Water");
+const sizeLandTypeArr = countriesSizeArr;
+let calls = 0;
 export let worldMap = helpers.createAndFillTwoDArray({
   rows: ROW_TOTAL,
   columns: COLUMN_TOTAL,
   defaultValue: DEFAULT_VALUE,
 });
 
-countriesSizeArr.forEach((islandInfo) => {
-  // let landTypeCount = islandInfo.subplots;
+//FUNCTIONS
+// console.log(worldMap);
+sizeLandTypeArr.forEach((islandInfo) => {
   let tempIslandArr = startAnIsland(worldMap);
   if (tempIslandArr) {
     let index = 0;
@@ -45,30 +107,37 @@ countriesSizeArr.forEach((islandInfo) => {
       let centerLoc = tempIslandArr[index];
       let nextLoc = centerLoc;
       DIRECTIONS_ARR.forEach((direction) => {
-        // console.log(tempIslandArr);
         nextLoc = helpers.valueDependentMovementTwoDArray({
           array: worldMap,
           xpos: centerLoc.x,
           ypos: centerLoc.y,
           direction: direction,
-          values: [DEFAULT_VALUE],
-          randomness: 0.2, //value should be < than randomness
+          values: "Ocean",
+          randomness: 0.4, //value should be < than randomness
         });
         if (nextLoc) {
           adjacent = helpers.checkAll8Adjacent(worldMap, nextLoc.x, nextLoc.y, [
-            DEFAULT_VALUE,
-            islandInfo.country,
+            DEFAULT_VALUE.continent,
+            islandInfo.country, //THIS IS NOT WORKING
           ]);
         }
 
         if (
           nextLoc &&
-          // adjacent &&
+          adjacent &&
           tempIslandArr.length < islandInfo.subplots["Land area"]
         ) {
-          let tempLandtype = pickLandType(islandInfo.subplots);
-          if (tempLandtype) worldMap[nextLoc.x][nextLoc.y] = tempLandtype;
-          else worldMap[nextLoc.x][nextLoc.y] = "Cropland";
+          let tempLandtype = pickLandType(
+            islandInfo.subplots,
+            worldMap[centerLoc.x][centerLoc.y].landType
+          );
+          if (tempLandtype)
+            worldMap[nextLoc.x][nextLoc.y] = new landUnits(
+              islandInfo.country,
+              tempLandtype,
+              { x: nextLoc.x, y: nextLoc.y }
+            );
+          // else worldMap[nextLoc.x][nextLoc.y] = "other"; //CHECK: if you see red on the screen something has gone wrong and is calling this
           tempIslandArr.push({
             x: nextLoc.x,
             y: nextLoc.y,
@@ -83,30 +152,26 @@ countriesSizeArr.forEach((islandInfo) => {
         index = 0;
       }
       index++;
-      calls += 1;
-      if (calls > 100) {
-        // debugger;
-      }
     }
   }
 });
 function startAnIsland(array) {
   let startPt = helpers.randomIndexForValue(array, DEFAULT_VALUE); //array + value
-  //   console.log(startPt);
   if (startPt != false) {
     let tempArr = [];
-    // array[startPt.x][startPt.y] = value;
     tempArr.push({
       x: startPt.x,
       y: startPt.y,
     });
+    // console.log(startPt);
     return tempArr;
   } else return false;
 }
-function pickLandType(obj) {
+function pickLandType(obj, centralLand) {
+  centralLand = centralLand.replaceAll("_", " ");
   let keys = Object.keys(obj).filter(
     (key) =>
-      obj[key] !== 0 &&
+      obj[key] != 0 &&
       (key == "Meadows" ||
         key == "Cropland" ||
         key == "Surface" ||
@@ -114,13 +179,21 @@ function pickLandType(obj) {
         key == "Naturally regenerating forest" ||
         key == "Other land")
   );
-  let randomIndex = Math.floor(Math.random() * keys.length);
-  if (randomIndex) {
+  if (keys.length > 0) {
+    let randomIndex;
+    if (keys.includes(centralLand) && Math.random > 1) {
+      randomIndex = centralLand;
+    } else {
+      randomIndex = Math.floor(Math.random() * keys.length);
+    }
     let selectedKey = keys[randomIndex];
     obj[selectedKey]--;
     selectedKey = selectedKey.replaceAll(" ", "_");
-    console.log(selectedKey);
-    return selectedKey;
-  }
+    if (selectedKey == "Other_land" && Math.random() > 0.8) {
+      return "Urban_land";
+    } else {
+      return selectedKey;
+    }
+  } else return "Cropland"; //TO DO: oceeania math is incorrect, 4 pixels end up undefined
 }
-console.log(worldMap);
+// console.log(JSON.stringify(countriesSizeArr[0]));

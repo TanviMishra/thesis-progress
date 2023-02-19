@@ -17,7 +17,7 @@ export function valueDependentMovementTwoDArray({
     case "top":
       if (
         xpos > 0 &&
-        values.includes(array[xpos - 1][ypos]) &&
+        values.includes(array[xpos - 1][ypos].continent) &&
         Math.random() > randomness
       ) {
         return { x: xpos - 1, y: ypos };
@@ -26,7 +26,7 @@ export function valueDependentMovementTwoDArray({
     case "right":
       if (
         ypos < array[0].length - 1 &&
-        values.includes(array[xpos][ypos + 1]) &&
+        values == array[xpos][ypos + 1].continent &&
         Math.random() > randomness
       ) {
         return { x: xpos, y: ypos + 1 };
@@ -35,7 +35,7 @@ export function valueDependentMovementTwoDArray({
     case "bottom":
       if (
         xpos < array.length - 1 &&
-        values.includes(array[xpos + 1][ypos]) &&
+        values == array[xpos + 1][ypos].continent &&
         Math.random() > randomness
       ) {
         return { x: xpos + 1, y: ypos };
@@ -44,7 +44,7 @@ export function valueDependentMovementTwoDArray({
     case "left":
       if (
         ypos > 0 &&
-        values.includes(array[xpos][ypos - 1]) &&
+        values == array[xpos][ypos - 1].continent &&
         Math.random() > randomness
       ) {
         {
@@ -56,6 +56,7 @@ export function valueDependentMovementTwoDArray({
       console.log("error");
       break;
   }
+  return null;
 }
 //chooses a random index from arr of specified value
 export function randomIndexForValue(arr, value) {
@@ -73,18 +74,42 @@ export function randomIndexForValue(arr, value) {
 }
 //returns true is all 8 positions around a specific position [x][y] in the array (arr) have values that are included in valueArr
 export function checkAll8Adjacent(arr, x, y, valueArr) {
-  let rows = arr.length;
-  let cols = arr[0].length;
-  for (let i = -1; i <= 1; i++) {
-    for (let j = -1; j <= 1; j++) {
+  for (let i = -2; i <= 2; i++) {
+    for (let j = -2; j <= 2; j++) {
       let newX = x + i;
       let newY = y + j;
-      if (newX >= 0 && newX < rows && newY >= 0 && newY < cols) {
-        if (!valueArr.includes(arr[newX][newY])) {
+      if (newX >= 0 && newX < arr.length && newY >= 0 && newY < arr[0].length) {
+        if (!valueArr.includes(arr[newX][newY].continent)) {
           return false;
         }
       }
     }
   }
   return true;
+}
+export function returnAll4Adjacent(arr, x, y, value) {
+  let directions = [];
+  if (x > 0 && arr[x - 1][y].landType !== value) {
+    directions.push("up");
+  }
+  if (x < arr.length - 1 && arr[x + 1][y].landType !== value) {
+    directions.push("down");
+  }
+  if (y > 0 && arr[x][y - 1].landType !== value) {
+    directions.push("left");
+  }
+  if (y < arr[x].length - 1 && arr[x][y + 1].landType !== value) {
+    directions.push("right");
+  }
+  return directions;
+}
+export function randomNumber(min, max) {
+  return (
+    Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) +
+    Math.ceil(min)
+  );
+}
+
+export function convert2Dindexto1D(xpos, ypos, twoDimarr) {
+  return xpos * twoDimarr[0].length + ypos;
 }
