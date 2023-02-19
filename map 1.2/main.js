@@ -19,24 +19,28 @@ console.log("THE END");
 //FUNCTIONS
 function drawIsland() {
   index = 0;
-  setRandom = 0.5; //Change to 0.5 to see the error at higher frequency
+  setRandom = 0.6; //increase by 0.1 to see the error at higher frequency
+  let islandInfo = countriesSizeArr[index]; //ADDED THIS
   while (index <= countriesSizeArr.length - 1) {
     calls = 0;
     //index will go from 0-4 //countriesSizeArr.length=5
     console.log("while 1 ", index);
-    let tempIslandArr;
+    let tempIslandArr = [];
     let tempStart;
-    const islandInfo = countriesSizeArr[index];
-    tempStart = startAnIsland(worldMap);
+    tempStart = startAnIsland(worldMap); //REMOVED FROM HERE
+
+    let noSpaceCount = 0;
     while (tempStart == -1) {
       console.log("while 2 ", tempStart);
       recalibrate();
       index = 0;
+
       tempStart = startAnIsland(worldMap);
+      tempIslandArr = [];
     }
-    tempIslandArr = tempStart;
+    islandInfo = countriesSizeArr[index]; //ADDED THIS
+    tempIslandArr.push(tempStart);
     let centerIndex = 0;
-    // if (tempIslandArr[centerIndex]) {
     problemchild: while (
       tempIslandArr.length <=
       islandInfo.subplots["Land area"] - 1
@@ -48,12 +52,14 @@ function drawIsland() {
       }
       let centerLoc = tempIslandArr[centerIndex];
       // let nextLoc = centerLoc;
-      DIRECTIONS_ARR.forEach((direction) => {
+      for (let index = 0; index < DIRECTIONS_ARR.length; index++) {
+        const direction = DIRECTIONS_ARR[index];
         let randomChange;
         if (
           direction ==
-          DIRECTIONS_ARR[helpers.randomNumber(0, DIRECTIONS_ARR.length)]
+          DIRECTIONS_ARR[helpers.randomNumber(0, DIRECTIONS_ARR.length - 1)]
         ) {
+          // console.log(direction);
           randomChange = 0;
         } else randomChange = setRandom;
         let nextLoc = helpers.valueDependentMovementTwoDArray({
@@ -93,33 +99,40 @@ function drawIsland() {
               x: nextLoc.x,
               y: nextLoc.y,
             });
+            // console.log(tempIslandArr[tempIslandArr.length - 1]);
           } else {
-            console.log("no space");
-            console.log(
-              nextLoc,
-              "land type is",
-              worldMap[nextLoc.x][nextLoc.y].landType,
-              "array is",
-              tempIslandArr
-            );
+            noSpaceCount++;
+            if (noSpaceCount > 100) {
+              // recalibrate();
+              // index = 0;
+              // tempStart = startAnIsland(worldMap);
+              // tempIslandArr = [];
+              // noSpaceCount = 0;
+              break problemchild;
+            }
+            // console.log("no space");
+            // console.log(
+            //   nextLoc,
+            //   "land type is",
+            //   worldMap[nextLoc.x][nextLoc.y].landType,
+            //   "array is",
+            //   tempIslandArr
+            // );
+            // worldMap[nextLoc.x][nextLoc.y].landType = "other";
           }
         }
-      });
+      }
       if (centerIndex < tempIslandArr.length - 1) {
         centerIndex++;
-      }
+      } //might not be neccescary now because of randomChange
     }
+    console.log(tempIslandArr.length);
     index++;
   }
-  // else {
-  //   recalibrate(); //HARD REDRAW / RESET
-  //   drawIsland(); //calling same fn
-  // }
-  // }
 }
 function startAnIsland(array) {
   let startPt = helpers.randomIndexForValue(array, DEFAULT_VALUE); //array + value
-  if (startPt.x) return [{ x: startPt.x, y: startPt.y }];
+  if (startPt.x) return { x: startPt.x, y: startPt.y };
   else {
     console.log("CANT FIND START");
     // recalibrate();
@@ -129,7 +142,7 @@ function startAnIsland(array) {
 }
 function recalibrate() {
   console.log("trying another attempt");
-  setRandom -= 0.1;
+  setRandom > 0 ? (setRandom -= 0.1) : (setRandom = 0);
   worldMap = helpers.createAndFillTwoDArray({
     rows: ROW_TOTAL,
     columns: COLUMN_TOTAL,
@@ -163,5 +176,5 @@ function pickLandType(obj, centralLand) {
     } else {
       return selectedKey;
     }
-  } else return "Cropland"; //TO DO: oceeania math is incorrect, 4 pixels end up undefined
+  } else return "other"; //TO DO: oceeania math is incorrect, 4 pixels end up undefined
 }
