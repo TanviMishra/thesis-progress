@@ -21,16 +21,19 @@ function drawIsland() {
   index = 0;
   setRandom = 0.6; //increase by 0.1 to see the error at higher frequency
   let islandInfo = countriesSizeArr[index]; //ADDED THIS
-  while (index <= countriesSizeArr.length - 1) {
+  let tempIslandInfo = islandInfo;
+  nextCountry: while (index <= countriesSizeArr.length - 1) {
+    // console.log("does problem child break here?");
     calls = 0;
     //index will go from 0-4 //countriesSizeArr.length=5
     console.log("while 1 ", index);
+    console.log(tempIslandInfo.subplots);
     let tempIslandArr = [];
     let tempStart;
     tempStart = startAnIsland(worldMap); //REMOVED FROM HERE
 
     let noSpaceCount = 0;
-    while (tempStart == -1) {
+    startingPt: while (tempStart == -1) {
       console.log("while 2 ", tempStart);
       recalibrate();
       index = 0;
@@ -38,22 +41,33 @@ function drawIsland() {
       tempStart = startAnIsland(worldMap);
       tempIslandArr = [];
     }
-    islandInfo = countriesSizeArr[index]; //ADDED THIS
+    // islandInfo = countriesSizeArr[index]; //ADDED THIS
+    tempIslandInfo = islandInfo;
     tempIslandArr.push(tempStart);
     let centerIndex = 0;
-    problemchild: while (
+    landUnitChange: while (
       tempIslandArr.length <=
-      islandInfo.subplots["Land area"] - 1
+      tempIslandInfo.subplots["Land area"] - 1
     ) {
       calls++;
       if (calls > 1000) {
-        console.log("STUCK IN LOOP", "array is", tempIslandArr);
-        break;
+        console.log("stuck in loop");
+        index = -1;
+        tempIslandArr = [];
+        noSpaceCount = 0;
+        recalibrate();
+        tempStart = startAnIsland(worldMap);
+        tempIslandInfo = islandInfo;
+        break landUnitChange;
       }
       let centerLoc = tempIslandArr[centerIndex];
       // let nextLoc = centerLoc;
-      for (let index = 0; index < DIRECTIONS_ARR.length; index++) {
-        const direction = DIRECTIONS_ARR[index];
+      for (
+        let directionIndex = 0;
+        directionIndex < DIRECTIONS_ARR.length;
+        directionIndex++
+      ) {
+        const direction = DIRECTIONS_ARR[directionIndex];
         let randomChange;
         if (
           direction ==
@@ -73,7 +87,7 @@ function drawIsland() {
         // console.log(nextLoc);
         if (
           nextLoc && //nextLoc should always be true, this should be redundant
-          tempIslandArr.length <= islandInfo.subplots["Land area"] - 1
+          tempIslandArr.length <= tempIslandInfo.subplots["Land area"] - 1
         ) {
           // console.log(
           //   nextLoc,
@@ -83,15 +97,15 @@ function drawIsland() {
           if (
             helpers.checkAll8Adjacent(worldMap, nextLoc.x, nextLoc.y, [
               DEFAULT_VALUE.continent,
-              islandInfo.continent,
+              tempIslandInfo.continent,
             ]) //CHECK THAT NO OTHER ISLAND IS ADJACENT
           ) {
             let tempLandtype = pickLandType(
-              islandInfo.subplots,
+              tempIslandInfo.subplots,
               worldMap[centerLoc.x][centerLoc.y].landType
             );
             worldMap[nextLoc.x][nextLoc.y] = new landUnits(
-              islandInfo.continent,
+              tempIslandInfo.continent,
               tempLandtype
               // { x: nextLoc.x, y: nextLoc.y }
             ); // else worldMap[nextLoc.x][nextLoc.y] = "other"; //CHECK: if you see red on the screen something has gone wrong and is calling this
@@ -103,30 +117,24 @@ function drawIsland() {
           } else {
             noSpaceCount++;
             if (noSpaceCount > 100) {
-              // recalibrate();
-              // index = 0;
-              // tempStart = startAnIsland(worldMap);
-              // tempIslandArr = [];
-              // noSpaceCount = 0;
-              break problemchild;
+              console.log("adjacent not found");
+              index = -1;
+              tempIslandArr = [];
+              noSpaceCount = 0;
+              recalibrate();
+              tempStart = startAnIsland(worldMap);
+              tempIslandInfo = islandInfo;
+              break landUnitChange;
             }
-            // console.log("no space");
-            // console.log(
-            //   nextLoc,
-            //   "land type is",
-            //   worldMap[nextLoc.x][nextLoc.y].landType,
-            //   "array is",
-            //   tempIslandArr
-            // );
-            // worldMap[nextLoc.x][nextLoc.y].landType = "other";
           }
         }
       }
       if (centerIndex < tempIslandArr.length - 1) {
         centerIndex++;
       } //might not be neccescary now because of randomChange
-    }
-    console.log(tempIslandArr.length);
+    } //end of landUnitChange
+    console.log("array length", tempIslandArr.length - 1);
+    console.log(tempIslandInfo.subplots);
     index++;
   }
 }
@@ -135,8 +143,6 @@ function startAnIsland(array) {
   if (startPt.x) return { x: startPt.x, y: startPt.y };
   else {
     console.log("CANT FIND START");
-    // recalibrate();
-    // drawIsland();
     return -1;
   }
 }
