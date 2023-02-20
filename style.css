@@ -1,13 +1,13 @@
 :root{
     --water: #038689;
-    --primary-tree:#456618;
-    --sec-tree:#98ea41;
-    --barren-land:#c6a4d6;
+    --primary-tree:#1e9400;
+    --sec-tree:#7ccf23;
+    --barren-land:#ad6a05;
     --urban:#cc3366;
     --cropland:#fbe32a;
     --meadow:#febd18;
     --bg: #053838;
-    --borderWidth:3px;
+    --borderWidth:0.3vw;
 }
 *{
     box-sizing: border-box;
@@ -115,7 +115,7 @@ body{
     background-color: wheat;
 } */
 .bottom{
-    border: var(--borderWidth) solid var(--bg);
+    border-bottom: var(--borderWidth) solid var(--bg);
 }
 .up{
     border-top: var(--borderWidth) solid var(--bg);
@@ -125,4 +125,12 @@ body{
 }
 .right{
     border-right: var(--borderWidth) solid var(--bg);
+}
+.upClass{
+    border-top-style: solid;
+    border-color: var(--bg);
+}
+.leftClass{
+    border-left-style: solid;
+    border-color: var(--bg);
 }

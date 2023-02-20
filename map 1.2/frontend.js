@@ -1,30 +1,34 @@
 import { landUnits } from "./landUnit.js";
 import * as helpers from "../helpers.js";
+import * as stylers from "../styleHelpers.js";
 import { worldMap } from "./main.js";
 let twoDimArr = worldMap;
-let domGridContainer = document.querySelector("#grid");
-let domGridWidth = domGridContainer.offsetWidth;
+let DomGridContainer = document.querySelector("#grid");
+let DomGridWidth = DomGridContainer.offsetWidth;
+let DomUnitWidth = twoDimArr[0].length;
 let selectedCoordinates = [];
-resizeArr();
-document.addEventListener("resize", resizeArr()); //TO DO: not working
+//FN CALL
+drawMap();
+//RESIZE
 document.querySelector("#zoom-in").addEventListener("click", function () {
-  domGridWidth += 200;
-  domGridContainer.style.width = domGridWidth + "px";
-  resizeArr();
+  DomGridWidth += 200;
+  DomGridContainer.style.width = DomGridWidth + "px";
+  drawMap();
   document.querySelector("body").style.backgroundColor = "#038689";
 });
 document.querySelector("#zoom-out").addEventListener("click", function () {
-  domGridWidth -= 200;
-  domGridContainer.style.width = domGridWidth + "px";
-  resizeArr();
+  DomGridWidth -= 200;
+  DomGridContainer.style.width = DomGridWidth + "px";
+  drawMap();
   document.querySelector("body").style.backgroundColor = "#038689";
 });
 document.querySelector("#reset").addEventListener("click", function () {
-  domGridContainer.style.width = 90 + "vw";
-  domGridWidth = domGridContainer.offsetWidth;
-  resizeArr();
+  DomGridContainer.style.width = 90 + "vw";
+  DomGridWidth = DomGridContainer.offsetWidth;
+  drawMap();
   document.querySelector("body").style.backgroundColor = "#166868";
 });
+document.addEventListener("resize", drawMap()); //TO DO: not working
 document.querySelector("body").addEventListener(
   "keypress",
   (event) => {
@@ -86,20 +90,20 @@ document.querySelector("body").addEventListener(
       default:
         break;
     }
-    resizeArr();
+    drawMap();
   },
   false
 );
-function resizeArr() {
-  domGridContainer.replaceChildren();
-  twoDimArr.forEach((row) => {
-    row.forEach((pixel) => {
+//FUNCTIONS
+function drawMap() {
+  DomGridContainer.replaceChildren();
+  twoDimArr.forEach((row, i) => {
+    row.forEach((pixel, j) => {
       let value = pixel.landType;
       // sumArray[value] = ++sumArray[value] || 0;
       let gridUnit = document.createElement("div");
       if (value != "Water") {
         gridUnit.classList.add("land");
-        // gridUnit.classList.add("top");
         gridUnit.addEventListener("mouseover", function () {
           document.querySelector("#hoverText").style.display = "block";
           pixel.hoverInfo(document.querySelector("#hoverText"));
@@ -107,34 +111,28 @@ function resizeArr() {
         gridUnit.addEventListener("click", function () {
           select(gridUnit);
           selectedCoordinates.push({
-            x: pixel.coordinates.x,
-            y: pixel.coordinates.y,
+            x: i,
+            y: j,
           });
         });
       } else {
-        // if()
+        addWaterDepth(gridUnit, i, j);
         gridUnit.addEventListener("mouseover", function () {
           document.querySelector("#hoverText").style.display = "none";
           pixel.hoverInfo(document.querySelector("#hoverText"));
         });
       }
       gridUnit.classList.add("gridUnit", value);
-      gridUnit.style.width = domGridWidth / twoDimArr[0].length + "px";
-      gridUnit.style.height = domGridWidth / twoDimArr[0].length + "px";
+      gridUnit.style.width = DomGridWidth / DomUnitWidth + "px";
+      gridUnit.style.height = DomGridWidth / DomUnitWidth + "px";
 
-      domGridContainer.append(gridUnit);
+      DomGridContainer.append(gridUnit);
     });
   });
 }
 function select(pixel) {
   pixel.classList.add("clicked");
 }
-// function deselect() {
-//   var clickedDivs = document.getElementsByClassName("clicked");
-//   while (clickedDivs.length > 0) {
-//     clickedDivs[0].classList.remove("clicked");
-//   }
-// }
 function calculateCarbonEmit(arr, clicked) {
   let sumCarbon = 0;
   arr.forEach((row) => {
@@ -147,27 +145,26 @@ function calculateCarbonEmit(arr, clicked) {
   document.querySelector("#carbonText").innerHTML =
     "TOTAL CARBON EMITTED: " + sumCarbon;
 }
-calculateCarbonEmit(twoDimArr);
-let DOMgrid = document.querySelector("#grid");
-let DomArr = [...DOMgrid.querySelectorAll("div")];
-for (let i = 0; i < twoDimArr.length; i++) {
-  //TO DO: add coordinates to original oceans
-  for (let j = 0; j < twoDimArr[i].length; j++) {
-    let directionArr = helpers.returnAll4Adjacent(twoDimArr, i, j, "Water");
-    if (twoDimArr[i][j].landType == "Water") {
-      if (directionArr.includes("up")) {
-        DomArr[i * twoDimArr[0].length + j].classList.add("up");
-      }
-      // if (directionArr.includes("bottom")) {
-      //   DomArr[i * twoDimArr[0].length + j].classList.add("bottom");
-      // }
-      if (directionArr.includes("left")) {
-        DomArr[i * twoDimArr[0].length + j].classList.add("left");
-      }
-      // if (directionArr.includes("right")) {
-      //   DomArr[i * twoDimArr[0].length + j].classList.add("right");
-      // }
-    }
+function addWaterDepth(domEl, i, j) {
+  let directionArr = helpers.returnAll4Adjacent(twoDimArr, i, j, "Water");
+  if (directionArr.includes("up")) {
+    domEl.classList.add("upClass");
+    stylers.applyStyle(
+      domEl,
+      "border-top-width",
+      (0.6 * DomGridWidth) / DomUnitWidth,
+      "px"
+    );
+  }
+  if (directionArr.includes("left")) {
+    domEl.classList.add("leftClass");
+    stylers.applyStyle(
+      domEl,
+      "border-left-width",
+      (0.6 * DomGridWidth) / DomUnitWidth,
+      "px"
+    );
   }
 }
+// calculateCarbonEmit(twoDimArr);
 // console.log(twoDimArr);

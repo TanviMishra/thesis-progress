@@ -2,7 +2,6 @@
 import { landUnits } from "./landUnit.js";
 import * as helpers from "../helpers.js";
 import { COLUMN_TOTAL, ROW_TOTAL, countriesSizeArr } from "./landuseCalc.js";
-
 const DIRECTIONS_ARR = ["top", "right", "bottom", "left"];
 const DEFAULT_VALUE = new landUnits("Ocean", "Water");
 let index, setRandom;
@@ -13,9 +12,8 @@ export let worldMap = helpers.createAndFillTwoDArray({
 });
 let calls = 0;
 //FUNCTION CALLS
-console.log(countriesSizeArr);
+// console.log(countriesSizeArr);
 drawIsland();
-console.log("THE END");
 
 //FUNCTIONS
 function drawIsland() {
@@ -24,21 +22,21 @@ function drawIsland() {
   // let islandInfo = countriesSizeArr[index];
   nextCountry: while (index <= countriesSizeArr.length - 1) {
     calls = 0;
-    console.log("while 1 ", index);
     let tempIslandArr = [];
     let tempStart = startAnIsland(worldMap);
     let noSpaceCount = 0;
     let centerIndex = 0;
     //GET START POINT
     startingPt: while (tempStart == -1) {
-      console.log("while 2 ", tempStart);
       index = 0;
       recalibrate();
       tempStart = startAnIsland(worldMap);
       tempIslandArr = [];
     }
     const islandInfo = countriesSizeArr[index]; //reinitialising islandInfo since start
-    let tempIslandInfo = islandInfo.subplots; //used in pickLandType
+    let tempIslandInfo = {};
+    tempIslandInfo = Object.assign(tempIslandInfo, islandInfo.subplots);
+    //used in pickLandType
     tempIslandArr.push(tempStart);
     //SET ALL LANDUNITS
     landUnitChange: while (
@@ -47,6 +45,7 @@ function drawIsland() {
     ) {
       calls++;
       if (calls > 1000) {
+        //Loop safeguard
         console.log("stuck in loop");
         [index, tempIslandArr, noSpaceCount, calls] = hardReset(
           index,
@@ -54,7 +53,7 @@ function drawIsland() {
           noSpaceCount,
           calls
         );
-        // tempIslandInfo = islandInfo.subplots;
+        tempIslandInfo = Object.assign(tempIslandInfo, islandInfo.subplots);
         recalibrate();
         tempStart = startAnIsland(worldMap); //not sure if this is needed
         break landUnitChange;
@@ -91,16 +90,14 @@ function drawIsland() {
               islandInfo.continent,
             ]) //CHECK THAT NO OTHER ISLAND IS ADJACENT
           ) {
-            let tempLandtype = "other";
-
+            let tempLandtype;
             [tempLandtype, tempIslandInfo] = pickLandType(
-              tempIslandInfo
-              // worldMap[centerLoc.x][centerLoc.y].landType
+              tempIslandInfo,
+              worldMap[centerLoc.x][centerLoc.y].landType
             ); //PROBLEM CHILD
             worldMap[nextLoc.x][nextLoc.y] = new landUnits(
               islandInfo.continent,
               tempLandtype
-              // { x: nextLoc.x, y: nextLoc.y }
             );
             tempIslandArr.push({
               x: nextLoc.x,
@@ -116,7 +113,10 @@ function drawIsland() {
                 noSpaceCount,
                 calls
               );
-              // tempIslandInfo = islandInfo.subplots;
+              tempIslandInfo = Object.assign(
+                tempIslandInfo,
+                islandInfo.subplots
+              );
               recalibrate();
               tempStart = startAnIsland(worldMap);
               break landUnitChange;
@@ -128,12 +128,6 @@ function drawIsland() {
         centerIndex++;
       } //might not be neccescary now because of randomChange
     } //end of landUnitChange
-    console.log(
-      // "this is temp",
-      // tempIslandInfo,
-      "this is supposed const",
-      islandInfo.subplots
-    );
     index++;
   }
 }
@@ -147,14 +141,15 @@ function startAnIsland(array) {
 }
 function recalibrate() {
   console.log("recalibrating values");
-  setRandom > 0 ? (setRandom -= 0.1) : (setRandom = 0);
+  if (setRandom > 0) {
+    setRandom -= 0.1;
+  } else setRandom = 0;
 }
 function pickLandType(dict, centralLand) {
-  // centralLand = centralLand.replaceAll("_", " ");
-  let tempDict = dict;
-  const nonZeroKeys = Object.keys(tempDict).filter(
+  centralLand = centralLand.replaceAll("_", " ");
+  const nonZeroKeys = Object.keys(dict).filter(
     (landTypeKey) =>
-      tempDict[landTypeKey] !== 0 &&
+      dict[landTypeKey] !== 0 &&
       (landTypeKey == "Meadows" ||
         landTypeKey == "Cropland" ||
         landTypeKey == "Planted Forest" ||
@@ -163,25 +158,25 @@ function pickLandType(dict, centralLand) {
   );
   // cnsole.log(nonZeroValues);
   if (nonZeroKeys.length > 0) {
-    const randomKey =
-      nonZeroKeys[Math.floor(Math.random() * nonZeroKeys.length)];
-    const landTypeValue = tempDict[randomKey];
-    // console.log("the pickLandType 1", randomKey, " : ", tempDict[randomKey]);
-    if (landTypeValue !== 0) {
-      tempDict[randomKey] = landTypeValue - 1;
+    let randomKey;
+    if (nonZeroKeys.includes(centralLand) && Math.random > 0.8) {
+      randomKey = centralLand;
+    } else {
+      randomKey = nonZeroKeys[Math.floor(Math.random() * nonZeroKeys.length)];
     }
-    // console.log("the pickLandType 2", randomKey, " : ", tempDict[randomKey]);
+    const landTypeValue = dict[randomKey];
+    if (landTypeValue !== 0) {
+      dict[randomKey] = landTypeValue - 1;
+    }
     let landType = randomKey.replaceAll(" ", "_");
-
-    return [landType, tempDict];
-  } else return ["other", tempDict]; //TO DO: oceeania math is incorrect, 4 pixels end up undefined
+    return [landType, dict];
+  } else return ["Cropland", dict]; //!! requirred because oceeania math is incorrect, 4 pixels end up undefined
 }
 function hardReset(i, arr, count, call) {
   i = -1;
   arr = [];
   count = 0;
   call = 0;
-  console.log(i, arr, count, call);
   worldMap = helpers.createAndFillTwoDArray({
     rows: ROW_TOTAL,
     columns: COLUMN_TOTAL,
