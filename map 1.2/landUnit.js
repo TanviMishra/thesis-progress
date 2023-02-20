@@ -1,20 +1,20 @@
 import * as helpers from "../helpers.js";
 export class landUnits {
-  constructor(continent, landType, biostock = 0) {
+  constructor(continent, landType = "other", biostock = 0) {
     this.continent = continent;
     this.landType = landType;
     this.biostock = biostock;
     // this.coordinates = coordinates;
-    if (this.landType == "Naturally_regenerating_forest") {
-      this.biostock = helpers.randomNumber(1, 12);
-    }
-    if (this.landType == "Planted_Forest") {
-      this.biostock = helpers.randomNumber(1, 6);
-    }
-    if (this.landType == "Other_land") {
-      this.biostock = helpers.randomNumber(1, 6);
-    }
-    this.carbonEmited = this.carbonEmitCalc(this.landType);
+    // if (this.landType == "Naturally_regenerating_forest") {
+    //   this.biostock = helpers.randomNumber(1, 12);
+    // }
+    // if (this.landType == "Planted_Forest") {
+    //   this.biostock = helpers.randomNumber(1, 6);
+    // }
+    // if (this.landType == "Other_land") {
+    //   this.biostock = helpers.randomNumber(1, 6);
+    // }
+    // this.carbonEmited = this.carbonEmitCalc(this.landType);
   }
   renameLandTypes(type) {
     switch (type) {
@@ -69,6 +69,8 @@ export class landUnits {
   }
   hoverInfo(domElement) {
     domElement.innerHTML =
+      "Continent: " +
+      this.continent +
       "Land type: " +
       this.renameLandTypes(this.landType) +
       "<br>" +

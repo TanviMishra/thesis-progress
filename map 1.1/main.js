@@ -86,6 +86,7 @@ export class landUnits {
 }
 import * as helpers from "../helpers.js";
 import { COLUMN_TOTAL, ROW_TOTAL, countriesSizeArr } from "./landuseCalc.js";
+console.log(countriesSizeArr);
 const DIRECTIONS_ARR = ["top", "right", "bottom", "left"];
 const DEFAULT_VALUE = new landUnits("Ocean", "Water");
 const sizeLandTypeArr = countriesSizeArr;
@@ -97,7 +98,7 @@ export let worldMap = helpers.createAndFillTwoDArray({
 });
 
 //FUNCTIONS
-// console.log(worldMap);
+
 sizeLandTypeArr.forEach((islandInfo) => {
   let tempIslandArr = startAnIsland(worldMap);
   if (tempIslandArr) {
