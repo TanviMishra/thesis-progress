@@ -114,6 +114,34 @@ function addEventListeners() {
           });
           selectedCoordinates = [];
           break;
+        case "2":
+          selectedCoordinates.forEach((coordinates) => {
+            localMap[coordinates.x][coordinates.y].landType = "Cropland";
+            socket.emit("mapChange", localMap);
+          });
+          selectedCoordinates = [];
+          break;
+        case "3":
+          selectedCoordinates.forEach((coordinates) => {
+            localMap[coordinates.x][coordinates.y].landType = "Planted_Forest";
+            socket.emit("mapChange", localMap);
+          });
+          selectedCoordinates = [];
+          break;
+        case "4":
+          selectedCoordinates.forEach((coordinates) => {
+            localMap[coordinates.x][coordinates.y].landType = "Other_land";
+            socket.emit("mapChange", localMap);
+          });
+          selectedCoordinates = [];
+          break;
+        case "1":
+          selectedCoordinates.forEach((coordinates) => {
+            localMap[coordinates.x][coordinates.y].landType = "Urban_land";
+            socket.emit("mapChange", localMap);
+          });
+          selectedCoordinates = [];
+          break;
       }
     },
     false

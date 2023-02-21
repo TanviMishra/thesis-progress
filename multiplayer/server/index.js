@@ -18,9 +18,8 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  console.log(`Socket ${socket.id} connected`);
   socket.on("connect", () => {
-    console.log(`Socket ${socket.id} connected`);
+    // console.log(`Socket ${socket.id} connected`);
   });
   socket.on("start", () => {
     io.emit("start", localWorldMap);
@@ -32,7 +31,7 @@ io.on("connection", (socket) => {
     // io.emit("mapChange", localWorldMap);
   });
   socket.on("disconnect", () => {
-    console.log(`Socket ${socket.id} disconnected`);
+    // console.log(`Socket ${socket.id} disconnected`);
   });
 });
 const PORT = process.env.PORT || 4000;
