@@ -3,7 +3,8 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import path from "path";
-import { worldMap } from "./main.js";
+import { worldMap } from "./islandGen.js";
+let localWorldMap = JSON.parse(JSON.stringify(worldMap));
 
 const app = express();
 const server = http.createServer(app);
@@ -18,13 +19,22 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log(`Socket ${socket.id} connected`);
-  io.emit("data", worldMap);
-
+  socket.on("connect", () => {
+    console.log(`Socket ${socket.id} connected`);
+  });
+  socket.on("start", () => {
+    io.emit("start", localWorldMap);
+  });
+  socket.on("mapChange", (map) => {
+    localWorldMap = JSON.parse(JSON.stringify(map));
+    socket.broadcast.emit("mapChange", localWorldMap);
+    socket.emit("mapChange", localWorldMap);
+    // io.emit("mapChange", localWorldMap);
+  });
   socket.on("disconnect", () => {
     console.log(`Socket ${socket.id} disconnected`);
   });
 });
-
 const PORT = process.env.PORT || 4000;
 //to prevent server blocking tyoe stuff
 app.use((req, res, next) => {
