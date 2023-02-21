@@ -1,0 +1,136 @@
+:root{
+    --water: #038689;
+    --primary-tree:#1e9400;
+    --sec-tree:#7ccf23;
+    --barren-land:#ad6a05;
+    --urban:#cc3366;
+    --cropland:#fbe32a;
+    --meadow:#febd18;
+    --bg: #053838;
+    --borderWidth:0.3vw;
+}
+*{
+    box-sizing: border-box;
+    margin:0;
+}
+h1{
+    color: var(--meadow);
+    font-size: 20px;
+    position: fixed;
+    bottom:65px;
+    left:65px;
+    z-index: 9;
+    padding:2px;
+    background-color: var(--bg);
+    width: fit-content;
+}
+body{
+    background-color: var(--bg);
+}
+#button-container{
+    position: fixed;
+    top:0;
+    right:0;
+    padding: 5vh 20px;
+    display: flex;
+    flex-direction: column;
+}
+#button-container button{
+    border-radius: 6px;
+    color: var(--urban);
+    font-size: 14px;
+    background: var(--meadow);
+    padding: 5px 10px;
+    text-decoration: none;
+    margin-bottom: 5px;
+}   
+#button-container button:hover {
+    background: var(--cropland);
+    text-decoration: none;
+}
+#hoverText{
+    position: fixed;
+    top:0;
+    left:0;
+    width: 180px;
+    background-color: var(--water);
+    border: 1px solid var(--meadow);
+    /* background-color: rgba(0, 0, 91, 0.448); */
+    color: var(--cropland);
+    padding: 10px;
+}
+#grid{
+    width: 90vw;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 5vh auto;
+
+}
+.land:hover{
+    border: 1px solid red;
+}
+.Water{
+    background-color: var(--water);
+}
+.Meadows{
+    background-color: var(--meadow);
+}
+.Cropland{
+    background-color: var(--cropland);
+}
+.Planted_Forest{
+    background-color: var(--sec-tree);
+}
+.Naturally_regenerating_forest{
+    background-color: var(--primary-tree);
+}
+.Other_land{
+    background-color: var(--barren-land);
+}
+.Urban_land{
+    background-color: var(--urban);
+}
+.other{
+    background-color: rgb(23, 22, 22);
+    opacity: 70%;
+}
+.clicked{
+    border: 1px solid red;
+}
+
+
+/* .Europe{
+    background-color: rgb(37, 53, 37);
+}
+.Asia{
+    background-color: greenyellow;
+}
+.Americas{
+    background-color: yellow;
+}
+.Africa{
+    background-color: orange;
+}
+.Oceania{
+    background-color: wheat;
+} */
+.bottom{
+    border-bottom: var(--borderWidth) solid var(--bg);
+}
+.up{
+    border-top: var(--borderWidth) solid var(--bg);
+}
+.left{
+    border-left: var(--borderWidth) solid var(--bg);
+}
+.right{
+    border-right: var(--borderWidth) solid var(--bg);
+}
+.upClass{
+    border-top-style: solid;
+    border-color: var(--bg);
+}
+.leftClass{
+    border-left-style: solid;
+    border-color: var(--bg);
+}
